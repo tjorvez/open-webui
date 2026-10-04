@@ -1,7 +1,7 @@
 # Open WebUI 👋
 
 Dieser Fork wird für mittwald Container Hosting und mittwald AI Hosting vorbereitet.
-Die Anleitung für GitHub-Secrets, den ersten Deploy und Updates steht in
+Die Anleitung zum manuellen Anlegen des Containers und Laden neuer GitHub-Images steht in
 [deploy/mittwald/README.md](deploy/mittwald/README.md).
 
 ![GitHub stars](https://img.shields.io/github/stars/open-webui/open-webui?style=social)

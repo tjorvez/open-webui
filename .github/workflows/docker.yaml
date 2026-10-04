@@ -1,15 +1,10 @@
-name: Build and deploy mittwald testing
+name: Build mittwald container image
 
 on:
   push:
     branches: [main, dev]
     tags: ['v*']
   workflow_dispatch:
-    inputs:
-      deploy:
-        description: Deploy this main commit to mittwald testing
-        type: boolean
-        default: false
 
 concurrency:
   group: mittwald-${{ github.ref }}
@@ -25,8 +20,6 @@ jobs:
     permissions:
       contents: read
       packages: write
-    outputs:
-      image_ref: ${{ steps.publish.outputs.image_ref }}
     steps:
       - uses: actions/checkout@v5
       - name: Set image name
@@ -58,7 +51,6 @@ jobs:
           IMAGE: ${{ steps.image.outputs.name }}:git-${{ github.sha }}
         run: bash deploy/mittwald/smoke-test.sh "$IMAGE"
       - name: Publish tested image
-        id: publish
         env:
           IMAGE_NAME: ${{ steps.image.outputs.name }}
         run: |
@@ -66,51 +58,6 @@ jobs:
           image="${IMAGE_NAME}:git-${GITHUB_SHA}"
           docker push "$image"
           digest=$(docker buildx imagetools inspect "$image" --format '{{.Manifest.Digest}}')
-          echo "image_ref=${IMAGE_NAME}@${digest}" >> "$GITHUB_OUTPUT"
           docker tag "$image" "${IMAGE_NAME}:${GITHUB_REF_NAME}"
           docker push "${IMAGE_NAME}:${GITHUB_REF_NAME}"
           echo "Image: ${IMAGE_NAME}@${digest}" >> "$GITHUB_STEP_SUMMARY"
-
-  deploy:
-    needs: build
-    if: github.ref == 'refs/heads/main' && (inputs.deploy == true || vars.MITTWALD_DEPLOY_ENABLED == 'true')
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    environment:
-      name: mittwald-testing
-      url: ${{ vars.WEBUI_URL }}
-    env:
-      IMAGE_REF: ${{ needs.build.outputs.image_ref }}
-      MITTWALD_API_TOKEN: ${{ secrets.MITTWALD_API_TOKEN }}
-      MITTWALD_STACK_ID: ${{ vars.MITTWALD_STACK_ID }}
-      MITTWALD_AI_API_KEY: ${{ secrets.MITTWALD_AI_API_KEY }}
-      WEBUI_URL: ${{ vars.WEBUI_URL }}
-      WEBUI_SECRET_KEY: ${{ secrets.WEBUI_SECRET_KEY }}
-      WEBUI_ADMIN_EMAIL: ${{ secrets.WEBUI_ADMIN_EMAIL }}
-      WEBUI_ADMIN_PASSWORD: ${{ secrets.WEBUI_ADMIN_PASSWORD }}
-    steps:
-      - uses: actions/checkout@v5
-      - name: Validate deployment configuration
-        run: |
-          python3 - <<'PY'
-          import os
-          import uuid
-          for name in ('MITTWALD_API_TOKEN', 'MITTWALD_STACK_ID'):
-              if not os.environ.get(name, '').strip():
-                  raise SystemExit(f'Missing configuration: {name}')
-          try:
-              uuid.UUID(os.environ['MITTWALD_STACK_ID'])
-          except ValueError:
-              raise SystemExit('MITTWALD_STACK_ID must be the stack UUID, not a project ID')
-          PY
-          python3 deploy/mittwald/render-stack.py --output "$RUNNER_TEMP/mittwald-stack.json"
-          python3 deploy/mittwald/check-stack.py
-      - name: Deploy tested image to mStudio
-        uses: mittwald/deploy-container-action@v1
-        with:
-          api_token: ${{ secrets.MITTWALD_API_TOKEN }}
-          stack_id: ${{ vars.MITTWALD_STACK_ID }}
-          stack_file: ${{ runner.temp }}/mittwald-stack.json
-      - name: Delete rendered secrets
-        if: always()
-        run: rm -f "$RUNNER_TEMP/mittwald-stack.json"
