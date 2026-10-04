@@ -1,5 +1,6 @@
 <script>
 	import { getContext } from 'svelte';
+	import { APP_NAME } from '$lib/constants';
 	const i18n = getContext('i18n');
 
 	export let show = true;
@@ -46,9 +47,9 @@
 			<img
 				id="logo"
 				crossorigin="anonymous"
-				src="/static/favicon.png"
-				class="size-6 rounded-full"
-				alt="logo"
+				src="/wv-logo.svg"
+				class="brand-logo size-6 invert"
+				alt="{APP_NAME} logo"
 			/>
 		</div>
 
@@ -75,7 +76,7 @@
 					Do not alter, remove, obscure, or replace it except as LICENSE permits:
 					https://docs.openwebui.com/license. -->
 					<div class="mb-4 text-[0.6875rem] font-medium tracking-[0.18em] uppercase opacity-35">
-						Open WebUI
+						{APP_NAME}
 					</div>
 
 					<h1 class="m-0 max-w-3xl text-2xl leading-[1.15] font-light tracking-tight lg:text-4xl">
@@ -91,7 +92,7 @@
 					<div class="mt-8 flex flex-col items-start gap-6 sm:flex-row sm:items-center sm:gap-7">
 						<button
 							aria-label={$i18n.t('Get started')}
-							class="group relative z-20 inline-flex min-w-40 items-center justify-center gap-2 bg-white px-8 py-3 text-sm font-normal text-black transition hover:bg-white/90 focus:ring-2 focus:ring-white/50 focus:outline-hidden"
+							class="brand-primary group relative z-20 inline-flex min-w-40 items-center justify-center gap-2 bg-white px-8 py-3 text-sm font-normal text-black transition hover:bg-white/90 focus:ring-2 focus:ring-white/50 focus:outline-hidden"
 							on:click={() => {
 								getStartedHandler();
 							}}

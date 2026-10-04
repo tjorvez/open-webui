@@ -15,6 +15,71 @@
 /* --app-text-scale is updated via the UI Scale slider (Interface.svelte) */
 :root {
 	--app-text-scale: 1;
+	--brand-focus: var(--color-brand);
+}
+
+.dark {
+	--brand-focus: var(--color-brand-light);
+}
+
+.brand-logo {
+	object-fit: contain;
+}
+
+.dark .brand-logo {
+	filter: invert(1);
+}
+
+/* Existing monochrome primary actions, plus the login submit buttons. */
+:is(button, a).bg-black.text-white,
+:is(button, a).bg-gray-900.text-white,
+button.brand-primary,
+button[role='switch'][aria-checked='true'] {
+	background-color: var(--color-brand);
+	color: white;
+}
+
+:is(button, a).bg-black.text-white:hover,
+:is(button, a).bg-gray-900.text-white:hover,
+button.brand-primary:hover {
+	background-color: var(--color-brand-hover);
+}
+
+button[role='switch'][aria-checked='true'] > span {
+	background-color: white;
+}
+
+:is(button, a).bg-black.text-white:focus-visible,
+:is(button, a).bg-gray-900.text-white:focus-visible,
+button.brand-primary:focus-visible,
+button[role='switch'][aria-checked='true']:focus-visible {
+	outline-color: var(--color-brand-light);
+}
+
+/* Reuse the current focus utilities without recoloring status badges or charts. */
+.focus\:border-blue-400:focus,
+.focus-within\:border-blue-400:focus-within,
+.dark .dark\:focus\:border-blue-500:focus,
+.dark .dark\:focus-within\:border-blue-500:focus-within {
+	border-color: var(--brand-focus);
+}
+
+.focus-within\:outline-blue-500:focus-within {
+	outline-color: var(--brand-focus);
+}
+
+.focus\:ring-blue-400\/20:focus {
+	--tw-ring-color: color-mix(in srgb, var(--brand-focus) 20%, transparent);
+}
+
+button.text-sky-500 {
+	color: var(--brand-focus);
+	background-color: color-mix(in srgb, var(--brand-focus) 10%, transparent);
+	border-color: color-mix(in srgb, var(--brand-focus) 30%, transparent);
+}
+
+button.text-sky-500:hover {
+	background-color: color-mix(in srgb, var(--brand-focus) 15%, transparent);
 }
 
 html {
@@ -49,7 +114,7 @@ code {
 }
 
 .editor-selection {
-	background: rgba(180, 213, 255, 0.5);
+	background: color-mix(in srgb, var(--brand-focus) 25%, transparent);
 	border-radius: 2px;
 }
 
@@ -62,7 +127,7 @@ code {
 }
 
 .app-interactive-active {
-	@apply bg-gray-50/40 dark:bg-gray-800/40;
+	@apply bg-brand/10 dark:bg-brand-light/10;
 }
 
 /* visibility:hidden is not focusable, so a keyboard user could never reveal these */
@@ -417,12 +482,12 @@ input[type='number'] {
 
 :focus-visible:not(.ProseMirror):not([contenteditable='true']):not(input):not(textarea),
 .focus-ring:focus-visible {
-	outline: 2px solid theme(--color-blue-500);
+	outline: 2px solid var(--brand-focus);
 	outline-offset: -2px;
 }
 
 html.high-contrast :is(input, textarea, [contenteditable='true'], .ProseMirror):focus-visible {
-	outline: 2px solid theme(--color-blue-500);
+	outline: 2px solid var(--brand-focus);
 	outline-offset: -2px;
 }
 
@@ -813,9 +878,9 @@ body {
 }
 
 :root {
-	--pm-accent: color-mix(in oklab, Highlight 70%, transparent);
-	--pm-fill-target: color-mix(in oklab, Highlight 26%, transparent);
-	--pm-fill-ancestor: color-mix(in oklab, Highlight 16%, transparent);
+	--pm-accent: color-mix(in oklab, var(--brand-focus) 70%, transparent);
+	--pm-fill-target: color-mix(in oklab, var(--brand-focus) 26%, transparent);
+	--pm-fill-ancestor: color-mix(in oklab, var(--brand-focus) 16%, transparent);
 }
 
 .pm-li-drop-before,

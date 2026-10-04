@@ -65,6 +65,7 @@ from open_webui.routers.retrieval import search_web as _search_web
 from open_webui.socket.main import sio
 from open_webui.tasks import stop_item_tasks
 from open_webui.tools.knowledge_fs import kb_exec  # noqa: F401 — re-exported
+from open_webui.utils.ask_user import MAX_ASK_USER_OPTIONS, get_ask_user_question_id
 from open_webui.utils.chat_id import is_saved_chat_id
 from open_webui.utils.json_codec import JSONCodec
 from open_webui.utils.notifications import notify_target
@@ -525,7 +526,7 @@ async def ask_user(
     Ask the user clarifying questions before continuing.
     Use this when the next step depends on user intent, preference, or a tradeoff that cannot be inferred safely.
 
-    :param questions: 1-3 question objects, each with id, header, question, and 2-3 options. Each option needs label and description.
+    :param questions: 1-3 question objects, each with a unique id, header, question, and 2-7 options. Each option needs label and description. Missing IDs are assigned automatically.
         List the option you recommend first; the UI labels the first option Recommended.
     :param allow_other: Whether users may enter a free-form answer instead of choosing one of the options
     :param timeout_ms: How long the browser should keep the prompt open before cancelling it
@@ -541,16 +542,14 @@ async def ask_user(
             if not isinstance(question, dict):
                 raise ValueError('Each question must be an object.')
 
-            question_id = str(question.get('id') or '').strip()[:64]
-            if not question_id:
-                raise ValueError('Each question requires a non-empty id.')
+            question_id = get_ask_user_question_id(question, index, questions)
             if question_id in seen_ids:
                 raise ValueError(f'Duplicate question id: {question_id}')
             seen_ids.add(question_id)
 
             options = question.get('options')
-            if not isinstance(options, list) or not 2 <= len(options) <= 3:
-                raise ValueError('Each question requires 2-3 options.')
+            if not isinstance(options, list) or not 2 <= len(options) <= MAX_ASK_USER_OPTIONS:
+                raise ValueError(f'Each question requires 2-{MAX_ASK_USER_OPTIONS} options.')
 
             normalized_options = []
             for option in options:

@@ -2,6 +2,13 @@
 
 @config '../tailwind.config.js';
 
+/* Also emit the tokens used directly by app.css. */
+@theme static {
+	--color-brand: #2f4f4f;
+	--color-brand-hover: #233b3b;
+	--color-brand-light: #a5c7c7;
+}
+
 @theme {
 	--font-sans:
 		var(--app-font-family, -apple-system), BlinkMacSystemFont, 'Inter', 'Vazirmatn', ui-sans-serif,
@@ -68,14 +75,14 @@
 	}
 
 	input[type='checkbox'] {
-		@apply appearance-none size-3.5 align-middle bg-white border border-gray-300 rounded transition cursor-pointer focus:ring-2 focus:ring-blue-500 focus:outline-none dark:bg-gray-800 dark:border-gray-600 self-center;
+		@apply appearance-none size-3.5 align-middle bg-white border border-gray-300 rounded transition cursor-pointer focus:ring-2 focus:ring-brand dark:focus:ring-brand-light focus:outline-none dark:bg-gray-800 dark:border-gray-600 self-center;
 		/* Center the custom mark */
 		display: inline-block;
 		position: relative;
 	}
 
 	input[type='checkbox']:checked {
-		@apply bg-blue-600 border-blue-600;
+		@apply bg-brand border-brand dark:border-brand-light;
 	}
 
 	input[type='checkbox']:after {

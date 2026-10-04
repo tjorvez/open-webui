@@ -968,8 +968,8 @@
 							Do not alter, remove, obscure, or replace it except as LICENSE permits:
 							https://docs.openwebui.com/license. -->
 								<img
-									src="{WEBUI_BASE_URL}/static/favicon.png"
-									class="sidebar-new-chat-icon size-5 rounded-full group-hover:hidden"
+									src="/wv-logo.svg"
+									class="brand-logo sidebar-new-chat-icon size-5 group-hover:hidden"
 									alt=""
 								/>
 
@@ -1155,8 +1155,8 @@
 					https://docs.openwebui.com/license. -->
 						<img
 							crossorigin="anonymous"
-							src="{WEBUI_BASE_URL}/static/favicon.png"
-							class="sidebar-new-chat-icon size-5 rounded-full"
+							src="/wv-logo.svg"
+							class="brand-logo sidebar-new-chat-icon size-5"
 							alt=""
 						/>
 					</a>

@@ -4,6 +4,21 @@ from open_webui.utils.json_codec import JSONCodec
 
 
 ASK_USER_NAME = 'ask_user'
+MAX_ASK_USER_OPTIONS = 7
+
+
+def get_ask_user_question_id(question: dict, index: int, questions: list[dict]) -> str:
+    question_id = str(question.get('id') or '').strip()[:64]
+    if question_id:
+        return question_id
+
+    reserved_ids = {
+        str(item.get('id') or '').strip()[:64] for item in questions if isinstance(item, dict)
+    }
+    question_id = f'question_{index + 1}'
+    while question_id in reserved_ids:
+        question_id += '_'
+    return question_id
 
 
 def get_ask_user_tool_calls(tool_calls: list[dict]) -> tuple[list[dict], str | None]:
@@ -34,16 +49,14 @@ def normalize_ask_user_request(arguments: dict) -> dict:
         if not isinstance(question, dict):
             raise ValueError('Each question must be an object.')
 
-        question_id = str(question.get('id') or '').strip()[:64]
-        if not question_id:
-            raise ValueError('Each question requires a non-empty id.')
+        question_id = get_ask_user_question_id(question, index, questions)
         if question_id in seen_ids:
             raise ValueError(f'Duplicate question id: {question_id}')
         seen_ids.add(question_id)
 
         options = question.get('options')
-        if not isinstance(options, list) or not 2 <= len(options) <= 3:
-            raise ValueError('Each question requires 2-3 options.')
+        if not isinstance(options, list) or not 2 <= len(options) <= MAX_ASK_USER_OPTIONS:
+            raise ValueError(f'Each question requires 2-{MAX_ASK_USER_OPTIONS} options.')
 
         normalized_options = []
         for option in options:
