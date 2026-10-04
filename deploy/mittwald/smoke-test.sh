@@ -2,7 +2,13 @@
 set -euo pipefail
 image="${1:?Usage: smoke-test.sh IMAGE}"
 container="open-webui-smoke-${RANDOM}"
-cleanup() { docker rm -f "$container" >/dev/null 2>&1 || true; }
+cleanup() {
+  result=$?
+  if [[ "$result" -ne 0 ]]; then
+    docker logs --tail=100 "$container" >&2 || true
+  fi
+  docker rm -f "$container" >/dev/null 2>&1 || true
+}
 trap cleanup EXIT
 
 docker run -d --name "$container" --read-only --network none \
@@ -23,9 +29,9 @@ docker run -d --name "$container" --read-only --network none \
   "$image" bash start-mittwald.sh >/dev/null
 
 for attempt in $(seq 1 90); do
-  if docker exec "$container" sh -c 'curl -fsS http://127.0.0.1:8080/health | jq -e ".status == true"' >/dev/null 2>&1; then
+  if docker exec "$container" sh -c 'curl -fsS http://127.0.0.1:8080/health | jq -ne "input.status == true"' >/dev/null 2>&1; then
     docker exec "$container" curl -fsS http://127.0.0.1:8080/ >/dev/null
-    docker exec "$container" sh -c 'curl -fsS http://127.0.0.1:8080/api/v1/auths/signin -H "Content-Type: application/json" -d '\''{"email":"admin@example.invalid","password":"smoke-test-only-password"}'\'' | jq -e '\''.role == "admin"'\''' >/dev/null
+    docker exec "$container" sh -c 'curl -fsS http://127.0.0.1:8080/api/v1/auths/signin -H "Content-Type: application/json" -d '\''{"email":"admin@example.invalid","password":"smoke-test-only-password"}'\'' | jq -ne '\''input.role == "admin"'\''' >/dev/null
     echo 'Read-only container startup and frontend passed.'
     exit 0
   fi
@@ -34,6 +40,5 @@ for attempt in $(seq 1 90); do
   fi
   sleep 2
 done
-docker logs --tail=100 "$container"
 echo 'Container startup failed.' >&2
 exit 1
