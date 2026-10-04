@@ -17,6 +17,8 @@ aber keine vorab geladenen lokalen Modellgewichte.
 4. Warte auf den erfolgreichen Build samt Container-Starttest.
 
 Der Workflow verwendet den eingebauten `GITHUB_TOKEN` zum Veröffentlichen.
+Der Frontend-Build erhält mit `NODE_BUILD_HEAP_MB=8192` ein Node-Heap-Limit von
+8 GB auf dem GitHub-Runner. Das beeinflusst nicht den RAM-Bedarf des laufenden Containers.
 Du brauchst dafür keine mittwald-Secrets, keine Stack-ID und kein GitHub-Environment.
 Wenn du die zuvor beschriebenen Deploy-Secrets oder das Environment
 `mittwald-testing` bereits angelegt hast, kannst du sie aus GitHub entfernen.

@@ -31,8 +31,9 @@ ARG USE_SLIM
 ARG UID
 ARG GID
 
-# Set Node.js options (heap limit Allocation failed - JavaScript heap out of memory)
-ENV NODE_OPTIONS="--max-old-space-size=4096"
+# Override for large frontend builds without changing the runtime container.
+ARG NODE_BUILD_HEAP_MB=4096
+ENV NODE_OPTIONS="--max-old-space-size=${NODE_BUILD_HEAP_MB}"
 
 WORKDIR /app
 

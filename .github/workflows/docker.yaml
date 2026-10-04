@@ -44,6 +44,7 @@ jobs:
           build-args: |
             BUILD_HASH=${{ github.sha }}
             PRELOAD_MODELS=false
+            NODE_BUILD_HEAP_MB=8192
           cache-from: type=gha
           cache-to: type=gha,mode=max
       - name: Test read-only container startup
