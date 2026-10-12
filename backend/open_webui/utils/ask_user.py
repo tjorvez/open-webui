@@ -12,9 +12,7 @@ def get_ask_user_question_id(question: dict, index: int, questions: list[dict]) 
     if question_id:
         return question_id
 
-    reserved_ids = {
-        str(item.get('id') or '').strip()[:64] for item in questions if isinstance(item, dict)
-    }
+    reserved_ids = {str(item.get('id') or '').strip()[:64] for item in questions if isinstance(item, dict)}
     question_id = f'question_{index + 1}'
     while question_id in reserved_ids:
         question_id += '_'

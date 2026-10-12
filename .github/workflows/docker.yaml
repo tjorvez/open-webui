@@ -43,6 +43,7 @@ jobs:
             org.opencontainers.image.revision=${{ github.sha }}
           build-args: |
             BUILD_HASH=${{ github.sha }}
+            BUILD_CHANNEL=${{ github.ref == 'refs/heads/dev' && 'dev' || (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')) && 'main' || 'unknown' }}
             PRELOAD_MODELS=false
             NODE_BUILD_HEAP_MB=8192
           cache-from: type=gha
